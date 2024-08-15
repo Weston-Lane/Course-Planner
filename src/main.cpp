@@ -18,7 +18,7 @@ struct Table
     int row = 5;
     int col = 1;
     std::vector<std::vector<bool>> selected;
-    
+    std::vector<std::vector<char*>> buffers;
     Table()
     {
         
@@ -26,7 +26,18 @@ struct Table
         {
             selected.push_back(std::vector<bool>(col, false));
         }
+        for (int r = 0; r < row; r++)
+        {
+            buffers.push_back(std::vector<char*>(col, new char[64]));//uses new, might break
+        }
           
+    }
+    ~Table()//deletes all of the new char arrays created
+    {
+        //for (int r = 0; r < row; r++)
+        //{
+        //    free(buffers[r].data());
+        //}
     }
     void addCol()
     {
@@ -35,18 +46,24 @@ struct Table
         {
             selected[r].push_back(false);
         }
+        for (int r = 0; r < row; r++)
+        {
+            buffers[r].push_back(new char[64]);
+        }
         
     }
     void addRow()
     {
         row++;
         selected.push_back(std::vector<bool>(col, false));
+        buffers.push_back(std::vector<char*>(col, new char[64]));
         
     }
     void deleteRow()
     {
         row--;
         selected.pop_back();
+        buffers.pop_back();
     }
     void deleteCol()
     {
@@ -54,6 +71,7 @@ struct Table
         for (int r = 0; r < row; r++)
         {
             selected[r].pop_back();
+            buffers[r].pop_back();
         }
     }
 
@@ -148,35 +166,33 @@ int main(int, char**)
             {
                 ImGui::TableSetColumnIndex(c);
                 ImGui::PushID(c + r * table.col);
-                char label[64];
+                
                 
                 if (table.selected[r][c])
                 {
 
-                    if (ImGui::InputText("##Edit", label, ImGuiInputTextFlags_EnterReturnsTrue))
-                        table.selected[r][c] = false;
+                    if (ImGui::InputText("##Edit", table.buffers[r][c], ImGuiInputTextFlags_EnterReturnsTrue));
+                        if(ImGui::IsKeyPressed(ImGuiKey_Enter))
+                            table.selected[r][c] = false;
+ 
                 }
                 else
                 {
                    
-                    snprintf(label, sizeof(label), " ");//need to use ImGui IDs to make this work
-                    if (ImGui::Selectable(label, table.selected[r][c], ImGuiSelectableFlags_AllowDoubleClick))
+                    snprintf(table.buffers[r][c], sizeof(table.buffers[r][c]),"");//need to use ImGui IDs to make this work
+                    if (ImGui::Selectable(table.buffers[r][c], table.selected[r][c], ImGuiSelectableFlags_AllowDoubleClick))
                     {
                         if (ImGui::IsMouseDoubleClicked(0))
                             table.selected[r][c] = true;
                     }
                 }
-
-
-
-                std::cout << table.selected[r][c];
                 
                 ImGui::PopID();
             }
-            std::cout<<std::endl;
+           
        
         }
-        std::cout << std::endl;
+      
         
         ImGui::EndTable();
         ImGui::End();
