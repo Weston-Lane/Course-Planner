@@ -1,3 +1,4 @@
+#pragma 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -16,9 +17,10 @@ static void glfw_error_callback(int error, const char* description)
 struct Table
 {
     int row = 5;
-    int col = 1;
+    int col = 2;
     std::vector<std::vector<bool>> selected;
-    std::vector<std::vector<char*>> buffers;
+    //std::vector<std::vector<char*>> buffers;
+    std::vector<char*> cellValues;
     Table()
     {
         
@@ -28,16 +30,28 @@ struct Table
         }
         for (int r = 0; r < row; r++)
         {
-            buffers.push_back(std::vector<char*>(col, new char[64]));//uses new, might break
+            //buffers.push_back(std::vector<char*>(col, new char[64]));//uses new, might break
         }
+
+        for (int r=0;r<row;r++)
+            for (int c = 0; c < col; c++)
+            {
+                cellValues.push_back(new char[32]);
+                strcpy_s(cellValues[c + r * col],2, " ");
+            }
+                
+    
           
     }
     ~Table()//deletes all of the new char arrays created
     {
-        //for (int r = 0; r < row; r++)
-        //{
-        //    free(buffers[r].data());
-        //}
+        for (int r = 0; r < row; r++)
+        {
+            for (int c = 0; c < col; c++)
+            {
+                //char* v = buffers[r][c];
+            }
+        }
     }
     void addCol()
     {
@@ -48,22 +62,24 @@ struct Table
         }
         for (int r = 0; r < row; r++)
         {
-            buffers[r].push_back(new char[64]);
+            //cellValues.push_back(new char[32]);
+            
         }
         
     }
     void addRow()
     {
         row++;
+
         selected.push_back(std::vector<bool>(col, false));
-        buffers.push_back(std::vector<char*>(col, new char[64]));
+       
         
     }
     void deleteRow()
     {
         row--;
         selected.pop_back();
-        buffers.pop_back();
+       
     }
     void deleteCol()
     {
@@ -71,7 +87,7 @@ struct Table
         for (int r = 0; r < row; r++)
         {
             selected[r].pop_back();
-            buffers[r].pop_back();
+           
         }
     }
 
@@ -153,9 +169,11 @@ int main(int, char**)
                 table.deleteRow();
         }
         
-        ImGui::BeginTable("table", table.col, ImGuiTableFlags_Borders);
+        ImGui::BeginTable("table", table.col, ImGuiTableFlags_Borders| ImGuiTableFlags_RowBg);
+        ImGui::TableSetupColumn("semester/classes");
+        ImGui::TableSetupColumn("credits");
+        ImGui::TableHeadersRow();
 
-        
 
         
         for (int r = 0; r < table.row; r++)
@@ -167,20 +185,23 @@ int main(int, char**)
                 ImGui::TableSetColumnIndex(c);
                 ImGui::PushID(c + r * table.col);
                 
-                
+                char buffer[64];
+
                 if (table.selected[r][c])
                 {
 
-                    if (ImGui::InputText("##Edit", table.buffers[r][c], ImGuiInputTextFlags_EnterReturnsTrue));
+                    if (ImGui::InputText("##Edit", table.cellValues[c + r * table.col], ImGuiInputTextFlags_EnterReturnsTrue));
                         if(ImGui::IsKeyPressed(ImGuiKey_Enter))
                             table.selected[r][c] = false;
- 
+                        
                 }
                 else
                 {
-                   
-                    snprintf(table.buffers[r][c], sizeof(table.buffers[r][c]),"");//need to use ImGui IDs to make this work
-                    if (ImGui::Selectable(table.buffers[r][c], table.selected[r][c], ImGuiSelectableFlags_AllowDoubleClick))
+                    
+
+
+                    snprintf(buffer, sizeof(buffer), table.cellValues[c+r*table.col]);//need to use ImGui IDs to make this work
+                    if (ImGui::Selectable(table.cellValues[c + r * table.col], table.selected[r][c], ImGuiSelectableFlags_AllowDoubleClick))
                     {
                         if (ImGui::IsMouseDoubleClicked(0))
                             table.selected[r][c] = true;
