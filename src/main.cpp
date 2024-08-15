@@ -5,13 +5,59 @@
 
 #include <stdio.h>
 #include <iostream>
-
+#include <vector>
 
 #include "Log.hpp"
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
+
+struct Table
+{
+    int row = 5;
+    int col = 1;
+    std::vector<std::vector<bool>> selected;
+    
+    Table()
+    {
+        
+        for (int r = 0; r < row; r++)
+        {
+            selected.push_back(std::vector<bool>(col, false));
+        }
+          
+    }
+    void addCol()
+    {
+        col++;
+        for (int r=0;r<row;r++)
+        {
+            selected[r].push_back(false);
+        }
+        
+    }
+    void addRow()
+    {
+        row++;
+        selected.push_back(std::vector<bool>(col, false));
+        
+    }
+    void deleteRow()
+    {
+        row--;
+        selected.pop_back();
+    }
+    void deleteCol()
+    {
+        col--;
+        for (int r = 0; r < row; r++)
+        {
+            selected[r].pop_back();
+        }
+    }
+
+};
 
 int main(int, char**)
 {
@@ -43,10 +89,10 @@ int main(int, char**)
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
-
-    int row = 5;
-    int col = 1;
-
+    
+    Table table;
+    
+    
     while (!glfwWindowShouldClose(window))
     {
    
@@ -62,24 +108,75 @@ int main(int, char**)
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowSize(viewport->Size);
+        //starts the imgui window with flags to make it full window size
         ImGui::Begin("hello",nullptr, ImGuiWindowFlags_NoDecoration| ImGuiWindowFlags_NoMove| ImGuiWindowFlags_NoResize);
 
         if (ImGui::Button("add column +"))
-            col++;
+        {
+            table.addCol();
+            
+        }
+            
+        if (ImGui::Button("delete column -"))
+        {
+            if (table.col > 1)
+                table.deleteCol();
+        }
+            
         
         if (ImGui::Button("add row +"))
-            row++;
+        {
+            table.addRow();
+        }
+            
+        if (ImGui::Button("delete row -"))
+        {
+            if (table.row > 0)
+                table.deleteRow();
+        }
+        
+        ImGui::BeginTable("table", table.col, ImGuiTableFlags_Borders);
 
-        ImGui::BeginTable("table", col);
-        for (int r = 0; r < row; r++)
+        
+
+        
+        for (int r = 0; r < table.row; r++)
         {
             ImGui::TableNextRow();
-            for (int c = 0; c < col; c++)
+            
+            for (int c = 0; c < table.col; c++)
             {
                 ImGui::TableSetColumnIndex(c);
-                ImGui::Text("row %d Col %d", r, c);
+                ImGui::PushID(c + r * table.col);
+                char label[64];
+                
+                if (table.selected[r][c])
+                {
+
+                    if (ImGui::InputText("##Edit", label, ImGuiInputTextFlags_EnterReturnsTrue))
+                        table.selected[r][c] = false;
+                }
+                else
+                {
+                   
+                    snprintf(label, sizeof(label), " ");//need to use ImGui IDs to make this work
+                    if (ImGui::Selectable(label, table.selected[r][c], ImGuiSelectableFlags_AllowDoubleClick))
+                    {
+                        if (ImGui::IsMouseDoubleClicked(0))
+                            table.selected[r][c] = true;
+                    }
+                }
+
+
+
+                std::cout << table.selected[r][c];
+                
+                ImGui::PopID();
             }
+            std::cout<<std::endl;
+       
         }
+        std::cout << std::endl;
         
         ImGui::EndTable();
         ImGui::End();
