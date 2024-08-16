@@ -20,7 +20,7 @@ struct Table
     int col = 2;
     std::vector<std::vector<bool>> selected;
     //std::vector<std::vector<char*>> buffers;
-    std::vector<char*> cellValues;
+    std::vector<std::vector<char*>> cellValues;
     Table()
     {
         
@@ -28,17 +28,14 @@ struct Table
         {
             selected.push_back(std::vector<bool>(col, false));
         }
+
         for (int r = 0; r < row; r++)
         {
-            //buffers.push_back(std::vector<char*>(col, new char[64]));//uses new, might break
-        }
-
-        for (int r=0;r<row;r++)
+            cellValues.push_back(std::vector<char*>(col, new char[64]));
             for (int c = 0; c < col; c++)
-            {
-                cellValues.push_back(new char[32]);
-                strcpy_s(cellValues[c + r * col],2, " ");
-            }
+                strcpy_s(cellValues[r][c], 2, " ");
+        }
+          
                 
     
           
@@ -62,7 +59,8 @@ struct Table
         }
         for (int r = 0; r < row; r++)
         {
-            //cellValues.push_back(new char[32]);
+            cellValues[r].push_back(new char[32]);
+            strcpy_s(cellValues[r].at(col-1), 2, " ");
             
         }
         
@@ -70,7 +68,6 @@ struct Table
     void addRow()
     {
         row++;
-
         selected.push_back(std::vector<bool>(col, false));
        
         
@@ -153,7 +150,7 @@ int main(int, char**)
             
         if (ImGui::Button("delete column -"))
         {
-            if (table.col > 1)
+            if (table.col > 2)
                 table.deleteCol();
         }
             
@@ -165,7 +162,7 @@ int main(int, char**)
             
         if (ImGui::Button("delete row -"))
         {
-            if (table.row > 0)
+            if (table.row > 1)
                 table.deleteRow();
         }
         
@@ -190,7 +187,7 @@ int main(int, char**)
                 if (table.selected[r][c])
                 {
 
-                    if (ImGui::InputText("##Edit", table.cellValues[c + r * table.col], ImGuiInputTextFlags_EnterReturnsTrue));
+                    if (ImGui::InputText("##Edit", table.cellValues[r][c], ImGuiInputTextFlags_EnterReturnsTrue));
                         if(ImGui::IsKeyPressed(ImGuiKey_Enter))
                             table.selected[r][c] = false;
                         
@@ -200,8 +197,8 @@ int main(int, char**)
                     
 
 
-                    snprintf(buffer, sizeof(buffer), table.cellValues[c+r*table.col]);//need to use ImGui IDs to make this work
-                    if (ImGui::Selectable(table.cellValues[c + r * table.col], table.selected[r][c], ImGuiSelectableFlags_AllowDoubleClick))
+                    snprintf(buffer, sizeof(buffer), table.cellValues[r][c]);//need to use ImGui IDs to make this work
+                    if (ImGui::Selectable(table.cellValues[r][c], table.selected[r][c], ImGuiSelectableFlags_AllowDoubleClick))
                     {
                         if (ImGui::IsMouseDoubleClicked(0))
                             table.selected[r][c] = true;
