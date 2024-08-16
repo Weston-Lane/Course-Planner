@@ -62,7 +62,18 @@ struct Table
         }
         for (int r = 0; r < row; r++)
         {
-            //cellValues.push_back(new char[32]);
+            
+            for (int c = 0; c < col; c++)
+            {
+                if (c == col - 1)
+                {
+                    cellValues.insert(cellValues.begin()+(c+r*col), new char[32]);
+                    strcpy_s(cellValues[c + r * col], 2, " ");
+                }
+
+                
+                    
+            }
             
         }
         
@@ -72,6 +83,20 @@ struct Table
         row++;
 
         selected.push_back(std::vector<bool>(col, false));
+
+        for (int r = 0; r < row; r++)
+        {
+            if (r == row - 1)
+            {
+                for (int c = 0; c < col; c++)
+                {
+                    cellValues.push_back(new char[32]);
+                    strcpy_s(cellValues[c + r * col], 2, " ");
+                }
+            }
+
+        }
+
        
         
     }
@@ -79,6 +104,19 @@ struct Table
     {
         row--;
         selected.pop_back();
+
+        for (int r = 0; r < row; r++)
+        {
+            if (r == row - 1)
+            {
+                for (int c = col; c >0; c--)
+                {
+                    cellValues.erase((cellValues.begin() + (c + r * col)));
+                    //strcpy_s(cellValues[c + r * col], 2, " ");
+                }
+            }
+
+        }
        
     }
     void deleteCol()
@@ -89,6 +127,21 @@ struct Table
             selected[r].pop_back();
            
         }
+        for (int r = 0; r < row; r++)
+        {
+
+            for (int c = 0; c < col; c++)
+            {
+                if (c == col - 1)
+                {
+                    cellValues.erase((cellValues.begin()+1)+(c + r * col));
+                    //strcpy_s(cellValues[c + r * col], 2, " ");
+                }
+
+            }
+
+        }
+        
     }
 
 };
@@ -153,7 +206,7 @@ int main(int, char**)
             
         if (ImGui::Button("delete column -"))
         {
-            if (table.col > 1)
+            if (table.col > 2)
                 table.deleteCol();
         }
             
