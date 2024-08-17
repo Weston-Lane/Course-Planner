@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
-
+#include <string>
 #include "Log.hpp"
 static void glfw_error_callback(int error, const char* description)
 {
@@ -37,7 +37,7 @@ struct Table
             for (int c = 0; c < col; c++)
             {
                 cellValues.push_back(new char[32]);
-                strcpy_s(cellValues[c + r * col],2, " ");
+                strcpy_s(cellValues[c + r * col],1, "");
             }
                 
     
@@ -68,7 +68,7 @@ struct Table
                 if (c == col - 1)
                 {
                     cellValues.insert(cellValues.begin()+(c+r*col), new char[32]);
-                    strcpy_s(cellValues[c + r * col], 2, " ");
+                    strcpy_s(cellValues[c + r * col], 1, "");
                 }
 
                 
@@ -91,7 +91,7 @@ struct Table
                 for (int c = 0; c < col; c++)
                 {
                     cellValues.push_back(new char[32]);
-                    strcpy_s(cellValues[c + r * col], 2, " ");
+                    strcpy_s(cellValues[c + r * col], 1, "");
                 }
             }
 
@@ -250,8 +250,6 @@ int main(int, char**)
                 }
                 else
                 {
-                    
-
 
                     snprintf(buffer, sizeof(buffer), table.cellValues[c+r*table.col]);//need to use ImGui IDs to make this work
                     if (ImGui::Selectable(table.cellValues[c + r * table.col], table.selected[r][c], ImGuiSelectableFlags_AllowDoubleClick))
@@ -266,9 +264,25 @@ int main(int, char**)
            
        
         }
-      
-        
+ 
         ImGui::EndTable();
+
+        int credits = 0;
+        for (int r = 0; r < table.row; r++)
+        {
+
+            for (int c = 0; c < table.col; c++)
+            {
+                if (c % 2 == 1);
+                {               
+                    credits+=std::atoi(table.cellValues[c + r * table.col]);
+                }
+
+            }
+
+        }
+        ImGui::Text("%d", credits);
+
         ImGui::End();
 
         // Rendering
