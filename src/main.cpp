@@ -225,27 +225,18 @@ int main(int, char**)
         }
         
         ImGui::BeginTable("table", table.col, ImGuiTableFlags_Borders| ImGuiTableFlags_RowBg| ImGuiTableFlags_Resizable| ImGuiTableFlags_Reorderable);
-        //TODO: trying to set up each cell heading to be specific header
-            //for (int i = 0; i < table.col; i+=2)
-            //{
-            //    if (table.col % 2 == 0)
-            //    {
-            //        ImGui::TableSetupColumn("Semester/Classes");
-            //        ImGui::TableSetupColumn("credits");
-            //    }
-            //    else if(table.col%2==1)
-            //    {
-            //        i += 1;
-            //        ImGui::TableSetupColumn("Semester/Classes");
-            //        ImGui::TableSetupColumn("credits");
-            //        ImGui::TableSetupColumn("Semester/Classes");
-            //    }
+        
+
+
+        //alternated the semester and credits headings
+        for (int i = 0; i < table.col; i++)
+        {
+            if(i%2==0)
+                ImGui::TableSetupColumn("Semester/Classes");
+            else
+                ImGui::TableSetupColumn("credits");
+        }
  
-            //}
- 
-        ImGui::TableSetupColumn("Semester/Classes");
-        ImGui::TableSetupColumn("credits");
-   
         ImGui::TableHeadersRow();
 
 
@@ -256,6 +247,7 @@ int main(int, char**)
             
             for (int c = 0; c < table.col; c++)
             {
+                ImGui::TableNextColumn();
                 ImGui::TableSetColumnIndex(c);
                 ImGui::PushID(c + r * table.col);
                 
@@ -292,6 +284,7 @@ int main(int, char**)
  
         ImGui::EndTable();
 
+        //calculates the credit info at the bottom
         int credits = 0;
         for (int r = 0; r < table.row; r++)
         {
