@@ -8,7 +8,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
+
 #include "Log.hpp"
+
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -201,7 +203,7 @@ int main(int, char**)
         if (ImGui::Button("add column +"))
         {
             table.addCol();
-            
+
         }
             
         if (ImGui::Button("delete column -"))
@@ -222,9 +224,28 @@ int main(int, char**)
                 table.deleteRow();
         }
         
-        ImGui::BeginTable("table", table.col, ImGuiTableFlags_Borders| ImGuiTableFlags_RowBg);
-        ImGui::TableSetupColumn("semester/classes");
+        ImGui::BeginTable("table", table.col, ImGuiTableFlags_Borders| ImGuiTableFlags_RowBg| ImGuiTableFlags_Resizable| ImGuiTableFlags_Reorderable);
+        //TODO: trying to set up each cell heading to be specific header
+            //for (int i = 0; i < table.col; i+=2)
+            //{
+            //    if (table.col % 2 == 0)
+            //    {
+            //        ImGui::TableSetupColumn("Semester/Classes");
+            //        ImGui::TableSetupColumn("credits");
+            //    }
+            //    else if(table.col%2==1)
+            //    {
+            //        i += 1;
+            //        ImGui::TableSetupColumn("Semester/Classes");
+            //        ImGui::TableSetupColumn("credits");
+            //        ImGui::TableSetupColumn("Semester/Classes");
+            //    }
+ 
+            //}
+ 
+        ImGui::TableSetupColumn("Semester/Classes");
         ImGui::TableSetupColumn("credits");
+   
         ImGui::TableHeadersRow();
 
 
@@ -242,11 +263,11 @@ int main(int, char**)
 
                 if (table.selected[r][c])
                 {
-
-                    if (ImGui::InputText("##Edit", table.cellValues[c + r * table.col], ImGuiInputTextFlags_EnterReturnsTrue));
-                        if(ImGui::IsKeyPressed(ImGuiKey_Enter))
-                            table.selected[r][c] = false;
-                        
+                    ImGui::InputText("##Edit", table.cellValues[c + r * table.col], ImGuiInputTextFlags_EnterReturnsTrue);
+                    if (!ImGui::IsItemActive()&&ImGui::IsKeyPressed(ImGuiKey_Enter))
+                    {    
+                        table.selected[r][c] = false;
+                    }
                 }
                 else
                 {
@@ -254,8 +275,12 @@ int main(int, char**)
                     snprintf(buffer, sizeof(buffer), table.cellValues[c+r*table.col]);//need to use ImGui IDs to make this work
                     if (ImGui::Selectable(table.cellValues[c + r * table.col], table.selected[r][c], ImGuiSelectableFlags_AllowDoubleClick))
                     {
-                        if (ImGui::IsMouseDoubleClicked(0))
+                        if (ImGui::IsMouseDoubleClicked(0) || ImGui::IsKeyPressed(ImGuiKey_Enter))
+                        {
+                            
                             table.selected[r][c] = true;
+                         }
+                            
                     }
                 }
                 
