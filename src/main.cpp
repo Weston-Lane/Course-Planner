@@ -40,16 +40,7 @@ struct Table
     
           
     }
-    ~Table()
-    {
-        for (int r = 0; r < row; r++)
-        {
-            for (int c = 0; c < col; c++)
-            {
-                
-            }
-        }
-    }
+
     void addCol()
     {
         col++;
@@ -222,16 +213,16 @@ int main(int, char**)
         //beginning of child text window
         ImGui::BeginChild("Instructions", ImVec2(0, 100), true);
         ImGui::TextUnformatted(
-        "To use: -Double click a cell to enter text or select with arrow keys and use Enter.\n"
-        "\t    -The 'Credits' cells will calculate the total credits from planned courses at the bottom.\n"
-        "\t    -The 'Semester/Classes' cells are used to label the semesters and classes planned to take.\n"
-        "\t    -When a col is added, an odd col will be a Semester col while an even will be a credits col, so click twice to add a semeseter and matching credits col.\n"
-        "\t    -Suggestion: use the top cell as the self made label for the semester and fill in the intended classes below it.n\n");
+        "To use: -Double click a cell to enter text or select with arrow keys and use Enter.\n\n"
+        "\t    -The 'Credits' cells will calculate the total credits from planned courses at the bottom.\n\n"
+        "\t    -The 'Semester/Classes' cells are used to label the semesters and classes planned to take.\n\n"
+        "\t    -When a col is added, an odd col will be a Semester col while an even will be a credits col, so click twice to add a semeseter and matching credits col.\n\n"
+        "\t    -Click and drag side of col to change the col length\n\n"
+        "\t    -Suggestion: use the top cell as the self made label for the semester and fill in the intended classes below it.n\n\n");
         ImGui::EndChild();
 
-
+        //begin table logic
         ImGui::BeginTable("table", table.col, ImGuiTableFlags_Borders| ImGuiTableFlags_RowBg| ImGuiTableFlags_Resizable| ImGuiTableFlags_Reorderable);
-
         //alternated the semester and credits headings
         for (int i = 0; i < table.col; i++)
         {
@@ -240,11 +231,10 @@ int main(int, char**)
             else
                 ImGui::TableSetupColumn("credits");
         }
- 
         ImGui::TableHeadersRow();
 
 
-        
+        //filling the table
         for (int r = 0; r < table.row; r++)
         {
             ImGui::TableNextRow();
@@ -285,7 +275,6 @@ int main(int, char**)
            
        
         }
- 
         ImGui::EndTable();
 
         //calculates the credit info at the bottom
@@ -304,6 +293,7 @@ int main(int, char**)
 
         }
         ImGui::Text("Credits: %d", credits);
+
 
         ImGui::End();
 
