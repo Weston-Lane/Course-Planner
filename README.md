@@ -3,6 +3,7 @@
 - simple Excel style text entering
 - delete and add desired col and rows
 - probably only useful to me
+- total credits added at the bottom left
 
 ## ℹ️ Overview
 This is a very simple Excel type class planner. I needed a way to plan out my classes for the rest of my college career and instead of learning how to use Excel (which would not have taken that long and would have been easier) I decided I wanted to make something myself. I'm sure this is not useful to anyone but me, but it's another project added to the progress bar. This was made in c++ 20 and used the ImGui GUI library. I have kept all of the dependencies and folder structure so nothing else should be needed to download and build the repo. 
