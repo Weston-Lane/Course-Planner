@@ -21,7 +21,6 @@ struct Table
     int row = 5;
     int col = 2;
     std::vector<std::vector<bool>> selected;
-    //std::vector<std::vector<char*>> buffers;
     std::vector<char*> cellValues;
     Table()
     {
@@ -29,10 +28,6 @@ struct Table
         for (int r = 0; r < row; r++)
         {
             selected.push_back(std::vector<bool>(col, false));
-        }
-        for (int r = 0; r < row; r++)
-        {
-            //buffers.push_back(std::vector<char*>(col, new char[64]));//uses new, might break
         }
 
         for (int r=0;r<row;r++)
@@ -45,13 +40,13 @@ struct Table
     
           
     }
-    ~Table()//deletes all of the new char arrays created
+    ~Table()
     {
         for (int r = 0; r < row; r++)
         {
             for (int c = 0; c < col; c++)
             {
-                //char* v = buffers[r][c];
+                
             }
         }
     }
@@ -114,7 +109,7 @@ struct Table
                 for (int c = col; c >0; c--)
                 {
                     cellValues.erase((cellValues.begin() + (c + r * col)));
-                    //strcpy_s(cellValues[c + r * col], 2, " ");
+                    
                 }
             }
 
@@ -137,7 +132,7 @@ struct Table
                 if (c == col - 1)
                 {
                     cellValues.erase((cellValues.begin()+1)+(c + r * col));
-                    //strcpy_s(cellValues[c + r * col], 2, " ");
+                    
                 }
 
             }
@@ -200,6 +195,7 @@ int main(int, char**)
         //starts the imgui window with flags to make it full window size
         ImGui::Begin("hello",nullptr, ImGuiWindowFlags_NoDecoration| ImGuiWindowFlags_NoMove| ImGuiWindowFlags_NoResize);
 
+        //bottons for adding and deleting col and rows
         if (ImGui::Button("add column +"))
         {
             table.addCol();
@@ -223,10 +219,18 @@ int main(int, char**)
             if (table.row > 0)
                 table.deleteRow();
         }
-        
-        ImGui::BeginTable("table", table.col, ImGuiTableFlags_Borders| ImGuiTableFlags_RowBg| ImGuiTableFlags_Resizable| ImGuiTableFlags_Reorderable);
-        
+        //beginning of child text window
+        ImGui::BeginChild("Instructions", ImVec2(0, 100), true);
+        ImGui::TextUnformatted(
+        "To use: -Double click a cell to enter text or select with arrow keys and use Enter.\n"
+        "\t    -The 'Credits' cells will calculate the total credits from planned courses at the bottom.\n"
+        "\t    -The 'Semester/Classes' cells are used to label the semesters and classes planned to take.\n"
+        "\t    -When a col is added, an odd col will be a Semester col while an even will be a credits col, so click twice to add a semeseter and matching credits col.\n"
+        "\t    -Suggestion: use the top cell as the self made label for the semester and fill in the intended classes below it.n\n");
+        ImGui::EndChild();
 
+
+        ImGui::BeginTable("table", table.col, ImGuiTableFlags_Borders| ImGuiTableFlags_RowBg| ImGuiTableFlags_Resizable| ImGuiTableFlags_Reorderable);
 
         //alternated the semester and credits headings
         for (int i = 0; i < table.col; i++)
@@ -299,7 +303,7 @@ int main(int, char**)
             }
 
         }
-        ImGui::Text("%d", credits);
+        ImGui::Text("Credits: %d", credits);
 
         ImGui::End();
 
